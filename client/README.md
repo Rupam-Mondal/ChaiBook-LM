@@ -1,16 +1,106 @@
-# React + Vite
+# 📡 API Endpoints
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Upload Documents / Links
 
-Currently, two official plugins are available:
+Uploads supported files or links, parses the content, chunks it, generates embeddings, and stores them for retrieval.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Endpoint
 
-## React Compiler
+```http
+POST /docs/upload
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Content Type
 
-## Expanding the ESLint configuration
+```text
+multipart/form-data
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Form Data
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `source` | Text | Upload any link. (if link is pasted use this)
+|`files` | file | upload file (if files pasted use this)
+
+### Supported Sources
+
+- 📄 PDF
+- 📝 DOCX
+- 📊 PPTX
+- 📃 TXT
+- 🎬 VTT
+- 🎞️ SRT
+- ▶️ YouTube URL
+- 🌐 Website URL
+- github url
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "message": "document uploaded successfully",
+  "data": [
+    [
+      {
+        "sourceId": "9adb3099-7424-4f43-9316-a612316d273b",
+        "title": "YouTube Video",
+        "type": "youtube",
+        "totalChunks": 4
+      }
+    ]
+  ]
+}
+```
+
+> **Note:** Save the returned `sourceId`. It is required for asking questions about the uploaded document.
+
+---
+
+## Ask Questions
+
+Ask questions about an uploaded document using its `sourceId`.
+
+### Endpoint
+
+```http
+POST /askquestion/question
+```
+
+### Content Type
+
+```text
+application/json
+```
+
+### Request Body
+
+```json
+{
+  "question": "mention the time stamp when author shouted to mr beast",
+  "docID": "9adb3099-7424-4f43-9316-a612316d273b"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `question` | String | Your question about the uploaded document. |
+| `docID` | String | The `sourceId` returned from the upload endpoint. |
+
+### Success Response
+
+```json
+{
+  "success": true,
+  "message": "Answer given successfully",
+  "data": "The author addresses MrBeast with a shout-out at the timestamp 00:00:49 in the video."
+}
+```
+
+### Features
+
+- 💬 Natural language question answering
+- ⏱️ Timestamp-aware answers for YouTube, VTT, and SRT files
+- 📚 Retrieval-Augmented Generation (RAG) powered responses
+- 🎯 Source-specific retrieval using the uploaded document ID
