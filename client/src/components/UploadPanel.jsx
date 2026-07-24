@@ -23,9 +23,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { uploadSource } from "@/lib/api"
 import { cn } from "@/lib/utils"
-import { getApiErrorMessage, normalizeUploadSources } from "@/lib/sources"
+import { getApiErrorMessage, isGithubUrl, normalizeUploadSources } from "@/lib/sources"
 
 const supportedTypes = ".pdf,.doc,.docx,.ppt,.pptx,.txt,.vtt,.srt"
+const GITHUB_INDEX_URL = "https://example.com"
 
 export function UploadPanel({ onSourcesReady }) {
   const [mode, setMode] = useState("link")
@@ -74,6 +75,11 @@ export function UploadPanel({ onSourcesReady }) {
 
     if (!canSubmit) {
       setError(mode === "link" ? "Paste a source link first." : "Select at least one file.")
+      return
+    }
+
+    if (mode === "link" && isGithubUrl(link.trim())) {
+      window.location.assign(GITHUB_INDEX_URL)
       return
     }
 
