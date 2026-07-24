@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils"
 import { getApiErrorMessage, isGithubUrl, normalizeUploadSources } from "@/lib/sources"
 
 const supportedTypes = ".pdf,.doc,.docx,.ppt,.pptx,.txt,.vtt,.srt"
-const GITHUB_INDEX_URL = "https://example.com"
+const GITHUB_INDEX_URL = "https://github-repo-assistant-rose.vercel.app/"
 
 export function UploadPanel({ onSourcesReady }) {
   const [mode, setMode] = useState("link")
@@ -42,6 +42,11 @@ export function UploadPanel({ onSourcesReady }) {
     if (isUploading) return false
     return mode === "link" ? link.trim().length > 0 : files.length > 0
   }, [files.length, isUploading, link, mode])
+
+  const isGithubLink = useMemo(
+    () => mode === "link" && isGithubUrl(link.trim()),
+    [link, mode]
+  )
 
   useEffect(() => {
     if (!isUploading) return undefined
@@ -169,7 +174,9 @@ export function UploadPanel({ onSourcesReady }) {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Sparkles className="size-4 shrink-0 text-emerald-200" />
-                We will prepare this source for grounded answers.
+                {isGithubLink
+                  ? "GitHub repository detected. Start indexing opens GitHub Repo Assistant."
+                  : "We will prepare this source for grounded answers."}
               </div>
             </div>
           ) : (
