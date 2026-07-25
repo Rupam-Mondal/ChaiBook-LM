@@ -3,7 +3,7 @@ import { QdrantVectorStore } from "@langchain/qdrant";
 import { randomUUID } from "crypto";
 import fs from "fs/promises";
 
-export async function generateVectorEmbeddings(data) {
+export async function generateVectorEmbeddings(data , sourceId) {
   try {
     const embeddings = new OpenAIEmbeddings({
       model: "text-embedding-3-small",
@@ -22,7 +22,7 @@ export async function generateVectorEmbeddings(data) {
     const uploadedSources = [];
 
     for (const document of data) {
-      const sourceId = randomUUID();
+      
       const docs = document.chunks.map((chunk, index) => ({
         pageContent: chunk,
         metadata: {

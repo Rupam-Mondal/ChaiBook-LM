@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { sourceIdentifier } from "../tools/bodyIdentifier.js";
 import { chunkDocuments } from "../tools/chukingTool.js";
 import { generateVectorEmbeddings } from "../tools/filesQdruntUploader.js";
@@ -6,6 +7,7 @@ import { websiteParser } from "../tools/websiteParser.js";
 
 export async function documentUploadService(data){
     try {
+        const sourceId = randomUUID();
         const sources = await sourceIdentifier(data);
         console.log(sources);
         const parsedDocuments = [];
@@ -14,14 +16,14 @@ export async function documentUploadService(data){
                 console.log("YouTube Processor");
                 const YTresult = await YTParser(data.source);
                 const chunkYT = await chunkDocuments([YTresult]);
-                const embeddingsYT = await generateVectorEmbeddings(chunkYT);
+                const embeddingsYT = await generateVectorEmbeddings(chunkYT , sourceId);
                 parsedDocuments.push(embeddingsYT);
             }
             else if (source.sourceType === "website"){
                 console.log("Website Processor");
                 const Websiteresult = await websiteParser(data.source);
                 const chunkWebsite = await chunkDocuments([Websiteresult]);
-                const embeddingsWebsite = await generateVectorEmbeddings(chunkWebsite);
+                const embeddingsWebsite = await generateVectorEmbeddings(chunkWebsite , sourceId);
                 parsedDocuments.push(embeddingsWebsite);
             }
             else if (source.sourceType === "github") {
@@ -31,7 +33,7 @@ export async function documentUploadService(data){
                 console.log("Remote PDF Processor");
                 const PDFURLresult = await PDFURLParser(data.source);
                 const chunkURLPDF = await chunkDocuments([PDFURLresult]);
-                const embeddingsURLPDF = await generateVectorEmbeddings(chunkURLPDF);
+                const embeddingsURLPDF = await generateVectorEmbeddings(chunkURLPDF , sourceId);
 
                 parsedDocuments.push(embeddingsURLPDF);
 
@@ -42,7 +44,7 @@ export async function documentUploadService(data){
                         console.log("PDF Parser");
                         const PDFresult = await PDFParser(source.path);
                         const chunkPDf = await chunkDocuments([PDFresult]);
-                        const embeddingsPDF = await generateVectorEmbeddings(chunkPDf);
+                        const embeddingsPDF = await generateVectorEmbeddings(chunkPDf , sourceId);
                         parsedDocuments.push(embeddingsPDF);
                         break;
 
@@ -50,7 +52,7 @@ export async function documentUploadService(data){
                         console.log("DOCX Parser");
                         const DOCXresult = await DOCXParser(source.path);
                         const chunkDOCX = await chunkDocuments([DOCXresult]);
-                        const embeddingsDOCX = await generateVectorEmbeddings(chunkDOCX);
+                        const embeddingsDOCX = await generateVectorEmbeddings(chunkDOCX , sourceId);
                         parsedDocuments.push(embeddingsDOCX)
                         break;
 
@@ -58,7 +60,7 @@ export async function documentUploadService(data){
                         console.log("PPTX Parser");
                         const PPTXresult = await PPTXParser(source.path);
                         const chunkPPTX = await chunkDocuments([PPTXresult]);
-                        const embeddingsPPTX = await generateVectorEmbeddings(chunkPPTX);
+                        const embeddingsPPTX = await generateVectorEmbeddings(chunkPPTX , sourceId);
                         parsedDocuments.push(embeddingsPPTX);
                         break;
 
@@ -66,7 +68,7 @@ export async function documentUploadService(data){
                         console.log("VTT Parser");
                         const VTTresult = await VTTParser(source.path);
                         const chunkVTT = await chunkDocuments([VTTresult]);
-                        const embeddingVTT = await generateVectorEmbeddings(chunkVTT);
+                        const embeddingVTT = await generateVectorEmbeddings(chunkVTT , sourceId);
                         parsedDocuments.push(embeddingVTT);
                         break;
                     
@@ -74,7 +76,7 @@ export async function documentUploadService(data){
                         console.log("TXT Parser");
                         const TXTresult = await TXTParser(source.path);
                         const chunkTXT = await chunkDocuments([TXTresult]);
-                        const embeddingsTXT = await generateVectorEmbeddings(chunkTXT);
+                        const embeddingsTXT = await generateVectorEmbeddings(chunkTXT , sourceId);
                         parsedDocuments.push(embeddingsTXT);
                         break;
 
@@ -82,7 +84,7 @@ export async function documentUploadService(data){
                         console.log("SRT Parser");
                         const SRTresult = await SRTParser(source.path);
                         const chunkSRT = await chunkDocuments([SRTresult]);
-                        const embeddingsSRT = await generateVectorEmbeddings(chunkSRT)
+                        const embeddingsSRT = await generateVectorEmbeddings(chunkSRT , sourceId)
                         parsedDocuments.push(embeddingsSRT);
                         break;
 
