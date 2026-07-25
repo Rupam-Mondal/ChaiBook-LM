@@ -1,7 +1,7 @@
 import { sourceIdentifier } from "../tools/bodyIdentifier.js";
 import { chunkDocuments } from "../tools/chukingTool.js";
 import { generateVectorEmbeddings } from "../tools/filesQdruntUploader.js";
-import { DOCXParser, PDFParser, PPTXParser,SRTParser,TXTParser,VTTParser, YTParser } from "../tools/parsers.js";
+import { DOCXParser, PDFParser, PDFURLParser, PPTXParser,SRTParser,TXTParser,VTTParser, YTParser } from "../tools/parsers.js";
 import { websiteParser } from "../tools/websiteParser.js";
 
 export async function documentUploadService(data){
@@ -29,6 +29,12 @@ export async function documentUploadService(data){
             }
             else if (source.sourceType === "pdf-url") {
                 console.log("Remote PDF Processor");
+                const PDFURLresult = await PDFURLParser(data.source);
+                const chunkURLPDF = await chunkDocuments([PDFURLresult]);
+                const embeddingsURLPDF = await generateVectorEmbeddings(chunkURLPDF);
+
+                parsedDocuments.push(embeddingsURLPDF);
+
             }
             else if(source.sourceType === "file"){
                 switch (source.extension) {

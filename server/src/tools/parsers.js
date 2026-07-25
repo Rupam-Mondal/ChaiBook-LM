@@ -1,4 +1,7 @@
+import os from "os";
+import { randomUUID } from "crypto";
 import fs from "fs/promises";
+import axios from "axios";
 import { PDFParse } from "pdf-parse";
 import path from "path";
 import mammoth from "mammoth";
@@ -175,6 +178,24 @@ export async function PPTXParser(filePath) {
       type: ".pptx",
       content: text.trim(),
     };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function PDFURLParser(filePath){
+  try {
+    let tempFilePath = path.join(os.tmpdir(), `${randomUUID()}.pdf`);
+
+    const response = await axios.get(filePath , {
+      responseType:"arraybuffer"
+    })
+
+    await fs.writeFile(tempFilePath, response.data);
+    const parsedPDF = await PDFParser(tempFilePath);
+
+    return parsedPDF;
+
   } catch (error) {
     throw error;
   }
