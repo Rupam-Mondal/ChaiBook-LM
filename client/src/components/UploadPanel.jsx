@@ -166,7 +166,7 @@ export function UploadPanel({ onSourcesReady }) {
                   className="h-11 rounded-xl border-white/10 bg-black/25 pl-10 pr-4 text-sm text-white placeholder:text-muted-foreground md:text-sm"
                   id="source-link"
                   onChange={(event) => setLink(event.target.value)}
-                  placeholder="Paste YouTube or website link"
+                  placeholder="Paste YouTube or website link or pdf url"
                   type="url"
                   value={link}
                 />
