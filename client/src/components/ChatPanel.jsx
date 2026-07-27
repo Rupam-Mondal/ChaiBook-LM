@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Bot, CornerDownLeft, MessageSquareText, Send, UserRound } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -202,13 +204,14 @@ function ChatMessage({ message }) {
       )}
       <div
         className={cn(
-          "max-w-[82%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6",
+          "max-w-[82%] rounded-xl px-4 py-3 text-sm leading-6",
+          isUser && "whitespace-pre-wrap",
           isUser
             ? "bg-white text-black"
             : "border border-white/10 bg-black/25 text-white"
         )}
       >
-        {message.content}
+        {isUser ? message.content : <ChatMarkdown content={message.content} />}
       </div>
       {isUser && (
         <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white">
@@ -216,5 +219,71 @@ function ChatMessage({ message }) {
         </div>
       )}
     </div>
+  )
+}
+
+function ChatMarkdown({ content }) {
+  return (
+    <ReactMarkdown
+      components={{
+        a: ({ children, ...props }) => (
+          <a
+            className="font-medium text-emerald-200 underline underline-offset-2 hover:text-emerald-100"
+            rel="noreferrer"
+            target="_blank"
+            {...props}
+          >
+            {children}
+          </a>
+        ),
+        blockquote: ({ children }) => (
+          <blockquote className="my-3 border-l-2 border-emerald-200/60 pl-3 text-white/75 first:mt-0 last:mb-0">
+            {children}
+          </blockquote>
+        ),
+        code: ({ children, className, ...props }) => {
+          const isCodeBlock = String(children).includes("\n")
+
+          return isCodeBlock ? (
+            <code className={cn("block min-w-max p-3 font-mono text-xs leading-5", className)} {...props}>
+              {children}
+            </code>
+          ) : (
+            <code
+              className={cn(
+                "rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.8em] text-emerald-100",
+                className
+              )}
+              {...props}
+            >
+              {children}
+            </code>
+          )
+        },
+        h1: ({ children }) => <h1 className="mb-3 text-xl font-semibold first:mt-0">{children}</h1>,
+        h2: ({ children }) => <h2 className="mb-2 mt-4 text-lg font-semibold first:mt-0">{children}</h2>,
+        h3: ({ children }) => <h3 className="mb-2 mt-3 font-semibold first:mt-0">{children}</h3>,
+        hr: () => <hr className="my-4 border-white/15" />,
+        li: ({ children }) => <li className="pl-1">{children}</li>,
+        ol: ({ children }) => <ol className="my-3 list-decimal space-y-1 pl-5 first:mt-0 last:mb-0">{children}</ol>,
+        p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+        pre: ({ children }) => (
+          <pre className="my-3 max-w-full overflow-x-auto rounded-lg border border-white/10 bg-black/40 first:mt-0 last:mb-0">
+            {children}
+          </pre>
+        ),
+        table: ({ children }) => (
+          <div className="my-3 max-w-full overflow-x-auto first:mt-0 last:mb-0">
+            <table className="w-full border-collapse text-left text-xs">{children}</table>
+          </div>
+        ),
+        td: ({ children }) => <td className="border border-white/15 px-2 py-1.5 align-top">{children}</td>,
+        th: ({ children }) => <th className="border border-white/15 bg-white/10 px-2 py-1.5 font-semibold">{children}</th>,
+        ul: ({ children }) => <ul className="my-3 list-disc space-y-1 pl-5 first:mt-0 last:mb-0">{children}</ul>,
+      }}
+      remarkPlugins={[remarkGfm]}
+    >
+      {String(content ?? "")}
+    </ReactMarkdown>
   )
 }
